@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+	<style>
+		body{
+			font-family: 'Press Start 2P', cursive;
+			max-width: 100%;
+			padding: 0;
+			margin: 0;
+			background: black;
+			color:white;
+		}
+		h3{
+			text-align: center;
+			font-size: 20px;
+		}
+		#results{
+			display: flex;
+			width: 100%;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
+		.conet{
+			width: 30%;
+			justify-content: center;
+			display: flex;
+		}
+		.sno{
+			flex: 1;
+			text-align: center;
+		}
+		.name{
+			flex: 1;
+		}
+		.score{
+			flex:1;
+			text-align: right;
+		}
+		.leader{
+			color: yellow;
+		}
+		hr {
+		  color: white;
+		  background-color: green;
+		  height: 5px;
+		  border:0px;
+		  width:800px;
+		}
+
+	</style>
+</head>
+<body>
+	<h3>Results</h1>
+	<hr />
+	<div id="results">
+		<div class="conet">
+			<span class="sno">S.No</span>
+			<span class="name">Name</span>
+			<span class="score">Score</span>
+		</div>
+		<br>
+	</div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script>	
+    var api = 'https://spreadsheets.google.com/feeds/cells/';
+	var spreadsheet = "1cIadWsqOsOz1Ewfu2-WWqtqGqk6XN7lH-fKLRfgOZoM";
+    var worksheet =   "default";
+    var names = [];
+    var entries = [];
+	var comp = [];
+	var length;
+	var temp;
+	function check(a){
+		if(a==0){
+			return "leader";
+		}
+		else{
+			return "";
+		}
+	}
+    $(document).ready(function(){
+	    var url = api+spreadsheet+'/'+worksheet+'/public/basic?min-col=15&max-col=15&alt=json'
+	    $.getJSON(url).done(function(data){
+	        	for(var i=1;i<data.feed.entry.length;i++){
+	        		names.push( data.feed.entry[i].content.$t);
+	        	}
+	        	console.log(names);
+	        });
+	    url = api+spreadsheet+'/'+worksheet+'/public/basic?min-col=25&max-col=25&alt=json';
+	    
+	    $.getJSON(url).done(function(data){
+	        	for(var i=1;i<data.feed.entry.length;i++){
+	        		entries.push(parseInt(data.feed.entry[i].content.$t));
+	        		
+	        	}
+	        	setTimeout(function(){
+		        	length = data.feed.entry.length-1;
+		        	if(names[0] == undefined){
+		        		location.reload();
+		        	} 
+		        	for(var i=0;i<length;i++){
+		        		for(var j=0;j<length-i;j++){
+		        			if(entries[j]<entries[j+1]){
+		        				entries[j+1] = [entries[j],entries[j] = entries[j+1]][0];
+		        				names[j+1] = [names[j],names[j] = names[j+1]][0];
+		        			}	
+		        		}
+		        	}
+
+		        	for(var k=0;k<length;k++){
+		        		$("#results").append("<div class='conet "+check(k)+"'><span class='sno'>"+(k+1)+"</span><span class='name'>"+names[k]+"</span><span class='score'>"+entries[k]+"</span></div><br>");
+		        	}
+		        },100);
+	        });
+	    
+	});
+	
+	</script>
+</body>
+</html>
